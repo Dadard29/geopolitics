@@ -18,6 +18,12 @@ var routes = service.RouteMapping{
 			http.MethodGet: controllers.RelationshipGet,
 		},
 	},
+	"/relationships/all": service.Route{
+		Description:   "manage all edges at once",
+		MethodMapping: service.MethodMapping{
+			http.MethodGet: controllers.RelationshipAllGet,
+		},
+	},
 }
 
 func main() {
