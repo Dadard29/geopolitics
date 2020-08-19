@@ -5,12 +5,12 @@ import (
 	"github.com/arangodb/go-driver"
 )
 
-func RelationshipGetFromCountry(country string) ([]models.Relationship, error) {
+func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error) {
 	query := `FOR r in relationship
-		FILTER r._to == @country OR r._from == @country
+		FILTER r._to == @countryId OR r._from == @countryId
 		return r`
-	bindVars := map[string]interface{} {
-		"country": country,
+	bindVars := map[string]interface{}{
+		"countryId": countryId,
 	}
 
 	cursor, err := executeQuery(query, bindVars)

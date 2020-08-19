@@ -40,7 +40,7 @@ func RelationshipPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var rel models.RelationshipDto
+	var rel models.RelationshipInput
 	err = json.Unmarshal(body, &rel)
 	if err != nil {
 		logger.Error(err.Error())
@@ -89,7 +89,6 @@ func RelationshipGet(w http.ResponseWriter, r *http.Request) {
 
 	api.Api.BuildJsonResponse(true, fmt.Sprintf("relationships for country %s retrieved", country), rel, w)
 }
-
 
 // GET
 // Authorization: 	token

@@ -80,7 +80,6 @@ func createDocument(collection string, doc interface{}) (driver.DocumentMeta, er
 		return f, err
 	}
 
-
 	meta, err := col.CreateDocument(ctx, doc)
 	if err != nil {
 		logger.Warning("failed to create doc")
@@ -92,18 +91,17 @@ func createDocument(collection string, doc interface{}) (driver.DocumentMeta, er
 
 func SetArangoDBConnector(url string, user string, password string, database string) error {
 	conn, err := http.NewConnection(http.ConnectionConfig{
-		Endpoints:          []string{url},
+		Endpoints: []string{url},
 	})
 	if err != nil {
 		return err
 	}
 
-
 	auth := driver.BasicAuthentication(user, password)
 
 	client, err := driver.NewClient(driver.ClientConfig{
-		Connection:                   conn,
-		Authentication:               auth,
+		Connection:     conn,
+		Authentication: auth,
 	})
 
 	if err != nil {
@@ -114,7 +112,6 @@ func SetArangoDBConnector(url string, user string, password string, database str
 	if err != nil {
 		return err
 	}
-
 
 	return nil
 }

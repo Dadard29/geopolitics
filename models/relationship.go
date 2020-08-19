@@ -27,16 +27,16 @@ func checkImpactValue(impact int) bool {
 	return true
 }
 
-type RelationshipDto struct {
-	Subject     string `json:"subject"`
-	ArticleLink string `json:"article_link"`
-	Brief       string `json:"brief"`
-	Sector      string `json:"sector"`
-	Date time.Time `json:"date"`
-	Impact int `json:"impact"`
+type RelationshipInput struct {
+	Subject     string    `json:"subject"`
+	ArticleLink string    `json:"article_link"`
+	Brief       string    `json:"brief"`
+	Sector      string    `json:"sector"`
+	Date        time.Time `json:"date"`
+	Impact      int       `json:"impact"`
 }
 
-func (r RelationshipDto) CheckSanity() error {
+func (r RelationshipInput) CheckSanity() error {
 	if r.Subject == "" ||
 		r.ArticleLink == "" ||
 		r.Brief == "" ||
@@ -67,7 +67,7 @@ type Relationship struct {
 	Impact      int       `json:"impact"`
 }
 
-func NewRelationshipFromDto(rel RelationshipDto, fromId string, toId string) (Relationship, error) {
+func NewRelationshipFromInput(rel RelationshipInput, fromId string, toId string) (Relationship, error) {
 	return Relationship{
 		FromId:      fromId,
 		ToId:        toId,

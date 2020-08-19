@@ -12,9 +12,10 @@ var Sc *subChecker.SubChecker
 var logger = log.NewLogger("CONTROLLER", logLevel.DEBUG)
 
 const (
-	apiName = "geopolitics"
+	apiName        = "geopolitics"
 	accessTokenKey = "X-Access-Token"
 )
+
 func checkToken(token string, w http.ResponseWriter) bool {
 	msg, err := Sc.CheckToken(token, apiName)
 	if err != nil {
@@ -26,4 +27,3 @@ func checkToken(token string, w http.ResponseWriter) bool {
 
 	return true
 }
-

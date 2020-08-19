@@ -1,44 +1,109 @@
 package managers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/Dadard29/geopolitics/models"
 	"github.com/Dadard29/geopolitics/repositories"
 )
 
-func RelationshipManagerGet(country string) ([]models.Relationship, error) {
-	countryId, err := repositories.CountryExists(country)
+func RelationshipManagerGet(countryKey string) (models.CountriesAndRelationships, error) {
+	var f models.CountriesAndRelationships
+
+	meta, countryEntity, err := repositories.CountryGet(countryKey)
 	if err != nil {
-		return nil, err
+		return f, err
 	}
 
-	return repositories.RelationshipGetFromCountry(countryId)
+	countryId := meta.ID.String()
+
+	// init node array
+	nodes := []models.CountryDto{
+		countryEntity.ToDto(meta),
+	}
+
+	// get the rels array
+	rels, err := repositories.RelationshipGetFromCountry(countryId)
+	if err != nil {
+		return f, err
+	}
+
+	for _, r := range rels {
+		var countryLinkedKey string
+
+		if r.FromId != countryId {
+			countryLinkedKey = repositories.CountryKeyFromId(r.FromId)
+		} else if r.ToId != countryId {
+			countryLinkedKey = repositories.CountryKeyFromId(r.ToId)
+		} else {
+			return f, errors.New(fmt.Sprintf("relationship loop detected on country %s", countryId))
+		}
+
+		// check if duplicate
+		found := false
+		for _, c := range nodes {
+			if c.Key == countryLinkedKey {
+				found = true
+			}
+		}
+
+		if found {
+			continue
+		}
+
+		// update node array
+		meta, countryLinked, err := repositories.CountryGet(countryLinkedKey)
+		if err != nil {
+			return f, err
+		}
+		nodes = append(nodes, countryLinked.ToDto(meta))
+	}
+
+	return models.CountriesAndRelationships{
+		Nodes: nodes,
+		Edges: rels,
+	}, nil
+
 }
 
-func RelationshipManagerCreate(rel models.RelationshipDto, from string, to string) (models.Relationship, error) {
-	var f models.Relationship
+func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.CountriesAndRelationships, error) {
+	var f models.CountriesAndRelationships
 
-	fromId, err := repositories.CountryExists(from)
+	meta, countryFrom, err := repositories.CountryGet(fromKey)
 	if err != nil {
-		logger.Warning(fmt.Sprintf("country `from` not found: %s", from))
+		logger.Warning(fmt.Sprintf("country `fromKey` not found: %s", fromKey))
 		return f, err
 	}
 
-	toId, err := repositories.CountryExists(to)
+	countryFromDto := countryFrom.ToDto(meta)
+	countryFromId := meta.ID.String()
+
+	meta, countryTo, err := repositories.CountryGet(toKey)
 	if err != nil {
-		logger.Warning(fmt.Sprintf("country `to` not found: %s", to))
+		logger.Warning(fmt.Sprintf("country `toKey` not found: %s", toKey))
 		return f, err
 	}
 
-	entity, err := models.NewRelationshipFromDto(rel, fromId, toId)
+	countryToDto := countryTo.ToDto(meta)
+	countryToId := meta.ID.String()
+
+	entity, err := models.NewRelationshipFromInput(relInput, countryFromId, countryToId)
 	if err != nil {
 		return f, err
 	}
 
-	out, err := repositories.RelationshipCreate(entity)
+	rel, err := repositories.RelationshipCreate(entity)
 	if err != nil {
 		return f, err
 	}
 
-	return out, nil
+	return models.CountriesAndRelationships{
+		Nodes: []models.CountryDto{
+			countryFromDto,
+			countryToDto,
+		},
+		Edges: []models.Relationship{
+			rel,
+		},
+	}, nil
 }

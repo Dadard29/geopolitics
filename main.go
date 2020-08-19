@@ -12,14 +12,14 @@ import (
 
 var routes = service.RouteMapping{
 	"/relationships": service.Route{
-		Description:   "manage edges between country nodes",
+		Description: "manage edges between country nodes",
 		MethodMapping: service.MethodMapping{
 			http.MethodPost: controllers.RelationshipPost,
-			http.MethodGet: controllers.RelationshipGet,
+			http.MethodGet:  controllers.RelationshipGet,
 		},
 	},
 	"/relationships/all": service.Route{
-		Description:   "manage all edges at once",
+		Description: "manage all edges at once",
 		MethodMapping: service.MethodMapping{
 			http.MethodGet: controllers.RelationshipAllGet,
 		},
