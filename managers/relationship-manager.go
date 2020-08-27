@@ -7,11 +7,10 @@ import (
 	"github.com/Dadard29/geopolitics/repositories"
 )
 
-// returns all edges connected to a specific country
-// todo
-// /!\ NOT USED BY GUI AS OF 27/08 /!\
-func RelationshipManagerGet(countryKey string) (models.CountriesAndRelationships, error) {
-	var f models.CountriesAndRelationships
+// returns all edges (scores) connected to a specific country
+// todo: useful ?
+func RelationshipManagerGet(countryKey string) (models.GraphScore, error) {
+	var f models.GraphScore
 
 	meta, countryEntity, err := repositories.CountryGet(countryKey)
 	if err != nil {
@@ -20,17 +19,18 @@ func RelationshipManagerGet(countryKey string) (models.CountriesAndRelationships
 
 	countryId := meta.ID.String()
 
-	// init node array
-	nodes := []models.CountryDto{
-		countryEntity.ToDto(meta),
-	}
-
 	// get the rels array
 	rels, err := repositories.RelationshipGetFromCountry(countryId)
 	if err != nil {
 		return f, err
 	}
 
+	// init node array
+	nodes := []models.CountryDto{
+		countryEntity.ToDto(meta),
+	}
+
+	// get all connected nodes
 	for _, r := range rels {
 		var countryLinkedKey string
 
@@ -62,16 +62,29 @@ func RelationshipManagerGet(countryKey string) (models.CountriesAndRelationships
 		nodes = append(nodes, countryLinked.ToDto(meta))
 	}
 
-	return models.CountriesAndRelationships{
+	// convert relationships to score edges
+	relSetArray := models.NewRelationshipSetArray(rels)
+	var scores = make([]models.RelationshipScore, 0)
+	for _, rs := range relSetArray.Sets {
+		newScore, err := rs.ToScore()
+		if err != nil {
+			logger.Warning(err.Error())
+			continue
+		}
+		scores = append(scores, newScore)
+	}
+
+	return models.GraphScore{
 		Nodes: nodes,
-		Edges: rels,
+		Edges: scores,
 	}, nil
 
 }
 
 // create a relationship between 2 countries
-func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.Relationship, error) {
-	var f models.CountriesAndRelationships
+// return a graph with the 2 countries and the created edge
+func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.Graph, error) {
+	var f models.Graph
 
 	meta, countryFrom, err := repositories.CountryGet(fromKey)
 	if err != nil {
@@ -101,12 +114,12 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 		return f, err
 	}
 
-	return models.CountriesAndRelationships{
+	return models.Graph{
 		Nodes: []models.CountryDto{
 			countryFromDto,
 			countryToDto,
 		},
-		Edges: []models.RelationshipScore{
+		Edges: []models.RelationshipEntity{
 			rel,
 		},
 	}, nil

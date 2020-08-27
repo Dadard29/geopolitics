@@ -6,28 +6,31 @@ import (
 )
 
 // return all countries with computed scored
-func CountryManagerGetAll() (models.CountriesAndRelationships, error) {
-	out, err := repositories.CountryGetAll()
+func CountryManagerGetAll() (models.GraphScore, error) {
+	countries, err := repositories.CountryGetAll()
 	if err != nil {
-		return models.CountriesAndRelationships{}, err
+		return models.GraphScore{}, err
 	}
 
-	return models.CountriesAndRelationships{
-		Nodes: out,
+	//rels, err := repositories.RelationshipGetAll()
+
+
+	return models.GraphScore{
+		Nodes: countries,
 		Edges: make([]models.RelationshipScore, 0),
 	}, nil
 }
 
 // return countries from a region with computed scores
-func CountryManagerGetRegion(region string) (models.CountriesAndRelationships, error) {
-	out, err := repositories.CountryGetRegion(region)
+func CountryManagerGetRegion(region string) (models.GraphScore, error) {
+	countries, err := repositories.CountryGetRegion(region)
 
 	if err != nil {
-		return models.CountriesAndRelationships{}, err
+		return models.GraphScore{}, err
 	}
 
-	return models.CountriesAndRelationships{
-		Nodes: out,
+	return models.GraphScore{
+		Nodes: countries,
 		Edges: make([]models.RelationshipScore, 0),
 	}, nil
 }

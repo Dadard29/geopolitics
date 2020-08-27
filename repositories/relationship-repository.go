@@ -5,6 +5,7 @@ import (
 	"github.com/arangodb/go-driver"
 )
 
+// get all edges connected to a country
 func RelationshipGetFromCountry(countryId string) ([]models.RelationshipEntity, error) {
 	query := `FOR r in relationship
 		FILTER r._to == @countryId OR r._from == @countryId
@@ -38,6 +39,8 @@ func RelationshipGetFromCountry(countryId string) ([]models.RelationshipEntity, 
 	return relList, nil
 }
 
+
+// create rel in db
 func RelationshipCreate(rel models.RelationshipEntity) (models.RelationshipEntity, error) {
 	var f models.RelationshipEntity
 
@@ -53,4 +56,11 @@ func RelationshipCreate(rel models.RelationshipEntity) (models.RelationshipEntit
 	}
 
 	return out, nil
+}
+
+
+
+func RelationshipGetAll() ([]models.RelationshipEntity, error) {
+	// todo
+	return nil, nil
 }

@@ -18,7 +18,7 @@ func CountryAllGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var out models.CountriesAndRelationships
+	var out models.GraphScore
 	var err error
 
 	region := r.URL.Query().Get("region")
