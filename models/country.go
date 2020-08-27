@@ -2,7 +2,8 @@ package models
 
 import "github.com/arangodb/go-driver"
 
-type Country struct {
+// country model of db
+type CountryEntity struct {
 	Name       string `json:"name"`
 	Capital    string `json:"capital"`
 	Population int    `json:"population"`
@@ -16,6 +17,7 @@ type Country struct {
 	Rank       int      `json:"rank"`
 }
 
+// country with metadata added
 type CountryDto struct {
 	Key        string `json:"key"`
 	Id         string `json:"id"`
@@ -32,7 +34,7 @@ type CountryDto struct {
 	Rank       int      `json:"rank"`
 }
 
-func (c Country) ToDto(meta driver.DocumentMeta) CountryDto {
+func (c CountryEntity) ToDto(meta driver.DocumentMeta) CountryDto {
 	return CountryDto{
 		Key:        meta.Key,
 		Id:         meta.ID.String(),

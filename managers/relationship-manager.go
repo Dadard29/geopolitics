@@ -7,6 +7,9 @@ import (
 	"github.com/Dadard29/geopolitics/repositories"
 )
 
+// returns all edges connected to a specific country
+// todo
+// /!\ NOT USED BY GUI AS OF 27/08 /!\
 func RelationshipManagerGet(countryKey string) (models.CountriesAndRelationships, error) {
 	var f models.CountriesAndRelationships
 
@@ -66,7 +69,8 @@ func RelationshipManagerGet(countryKey string) (models.CountriesAndRelationships
 
 }
 
-func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.CountriesAndRelationships, error) {
+// create a relationship between 2 countries
+func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.Relationship, error) {
 	var f models.CountriesAndRelationships
 
 	meta, countryFrom, err := repositories.CountryGet(fromKey)
@@ -87,7 +91,7 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 	countryToDto := countryTo.ToDto(meta)
 	countryToId := meta.ID.String()
 
-	entity, err := models.NewRelationshipFromInput(relInput, countryFromId, countryToId)
+	entity, err := relInput.ToEntity(countryFromId, countryToId)
 	if err != nil {
 		return f, err
 	}
@@ -102,7 +106,7 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 			countryFromDto,
 			countryToDto,
 		},
-		Edges: []models.Relationship{
+		Edges: []models.RelationshipScore{
 			rel,
 		},
 	}, nil

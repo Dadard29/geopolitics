@@ -8,10 +8,13 @@ import (
 	"strings"
 )
 
+// return key from id
+// 'country/FRA' gives 'FRA'
 func CountryKeyFromId(id string) string {
 	return strings.Split(id, "/")[1]
 }
 
+// return all countries
 func CountryGetAll() ([]models.CountryDto, error) {
 	var f []models.CountryDto
 
@@ -36,7 +39,7 @@ func CountryGetAll() ([]models.CountryDto, error) {
 	defer cursor.Close()
 
 	for {
-		var country models.Country
+		var country models.CountryEntity
 		meta, err := cursor.ReadDocument(ctx, &country)
 		if driver.IsNoMoreDocuments(err) {
 			break
@@ -54,6 +57,7 @@ func CountryGetAll() ([]models.CountryDto, error) {
 	return out, nil
 }
 
+// return all countries that belongs to the region
 func CountryGetRegion(region string) ([]models.CountryDto, error) {
 	var regionNode models.RegionNode
 	regionNodeMeta, err := getDocument(regionNodesCollectionName, region, &regionNode)
@@ -80,7 +84,7 @@ func CountryGetRegion(region string) ([]models.CountryDto, error) {
 
 	var relList = make([]models.CountryDto, 0)
 	for {
-		var doc models.Country
+		var doc models.CountryEntity
 		meta, err := cursor.ReadDocument(ctx, &doc)
 		if driver.IsNoMoreDocuments(err) {
 			break
@@ -95,10 +99,11 @@ func CountryGetRegion(region string) ([]models.CountryDto, error) {
 	return relList, nil
 }
 
-func CountryGet(countryKey string) (driver.DocumentMeta, models.Country, error) {
-	var f models.Country
+// retrieve one specific country from key
+func CountryGet(countryKey string) (driver.DocumentMeta, models.CountryEntity, error) {
+	var f models.CountryEntity
 
-	var c models.Country
+	var c models.CountryEntity
 	meta, err := getDocument(countryCollectionName, countryKey, &c)
 	if err != nil {
 		return meta, f, err
@@ -111,7 +116,7 @@ func CountryGet(countryKey string) (driver.DocumentMeta, models.Country, error) 
 func CountryExists(countryKey string) (string, error) {
 	var f string
 
-	var c models.Country
+	var c models.CountryEntity
 	meta, err := getDocument(countryCollectionName, countryKey, &c)
 	if err != nil {
 		return f, err

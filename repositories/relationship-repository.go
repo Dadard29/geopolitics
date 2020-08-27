@@ -5,7 +5,7 @@ import (
 	"github.com/arangodb/go-driver"
 )
 
-func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error) {
+func RelationshipGetFromCountry(countryId string) ([]models.RelationshipEntity, error) {
 	query := `FOR r in relationship
 		FILTER r._to == @countryId OR r._from == @countryId
 		return r`
@@ -21,9 +21,9 @@ func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error)
 
 	defer cursor.Close()
 
-	var relList = make([]models.Relationship, 0)
+	var relList = make([]models.RelationshipEntity, 0)
 	for {
-		var doc models.Relationship
+		var doc models.RelationshipEntity
 		_, err := cursor.ReadDocument(ctx, &doc)
 		if driver.IsNoMoreDocuments(err) {
 			break
@@ -38,15 +38,15 @@ func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error)
 	return relList, nil
 }
 
-func RelationshipCreate(rel models.Relationship) (models.Relationship, error) {
-	var f models.Relationship
+func RelationshipCreate(rel models.RelationshipEntity) (models.RelationshipEntity, error) {
+	var f models.RelationshipEntity
 
 	meta, err := createDocument(relationshipCollectionName, rel)
 	if err != nil {
 		return f, err
 	}
 
-	var out models.Relationship
+	var out models.RelationshipEntity
 	_, err = getDocument(relationshipCollectionName, meta.Key, &out)
 	if err != nil {
 		return f, err
