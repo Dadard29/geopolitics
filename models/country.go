@@ -7,8 +7,8 @@ type Country struct {
 	Capital    string `json:"capital"`
 	Population int    `json:"population"`
 	Coordinate struct {
-		Latitude  int `json:"latitude"`
-		Longitude int `json:"longitude"`
+		Latitude  float32 `json:"latitude"`
+		Longitude float32 `json:"longitude"`
 	} `json:"coordinate"`
 	Currencies []string `json:"currencies"`
 	Languages  []string `json:"languages"`
@@ -23,8 +23,8 @@ type CountryDto struct {
 	Capital    string `json:"capital"`
 	Population int    `json:"population"`
 	Coordinate struct {
-		Latitude  int `json:"latitude"`
-		Longitude int `json:"longitude"`
+		Latitude  float32 `json:"latitude"`
+		Longitude float32 `json:"longitude"`
 	} `json:"coordinate"`
 	Currencies []string `json:"currencies"`
 	Languages  []string `json:"languages"`
@@ -40,8 +40,8 @@ func (c Country) ToDto(meta driver.DocumentMeta) CountryDto {
 		Capital:    c.Capital,
 		Population: c.Population,
 		Coordinate: struct {
-			Latitude  int `json:"latitude"`
-			Longitude int `json:"longitude"`
+			Latitude  float32 `json:"latitude"`
+			Longitude float32 `json:"longitude"`
 		}{
 			Latitude:  c.Coordinate.Latitude,
 			Longitude: c.Coordinate.Longitude,

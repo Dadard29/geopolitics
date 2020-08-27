@@ -24,6 +24,17 @@ var routes = service.RouteMapping{
 			http.MethodGet: controllers.RelationshipAllGet,
 		},
 	},
+	"/countries": service.Route{
+		Description:   "manage countries one by one",
+		MethodMapping: service.MethodMapping{
+		},
+	},
+	"/countries/all": service.Route{
+		Description:   "manage countries all at once",
+		MethodMapping: service.MethodMapping{
+			http.MethodGet: controllers.CountryAllGet,
+		},
+	},
 }
 
 func main() {

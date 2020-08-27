@@ -10,13 +10,15 @@ import (
 	"github.com/arangodb/go-driver/http"
 )
 
-var logger = log.NewLogger("CONTROLLER", logLevel.DEBUG)
+var logger = log.NewLogger("REPOSITORY", logLevel.DEBUG)
 
 var connector driver.Database
 var ctx = context.Background()
 
-var countryCollection = "country"
-var relationshipCollection = "relationship"
+var countryCollectionName = "country"
+var relationshipCollectionName = "relationship"
+var regionNodesCollectionName = "region_nodes"
+var regionEdgesCollectionName = "region_edges"
 
 func executeQuery(query string, bindVars map[string]interface{}) (driver.Cursor, error) {
 	return connector.Query(ctx, query, bindVars)
@@ -89,6 +91,7 @@ func createDocument(collection string, doc interface{}) (driver.DocumentMeta, er
 	return meta, nil
 }
 
+// init driver
 func SetArangoDBConnector(url string, user string, password string, database string) error {
 	conn, err := http.NewConnection(http.ConnectionConfig{
 		Endpoints: []string{url},
@@ -112,6 +115,8 @@ func SetArangoDBConnector(url string, user string, password string, database str
 	if err != nil {
 		return err
 	}
+
+	logger.Info(fmt.Sprintf("connected to database %s", database))
 
 	return nil
 }

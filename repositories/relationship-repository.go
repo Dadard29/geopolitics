@@ -9,6 +9,7 @@ func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error)
 	query := `FOR r in relationship
 		FILTER r._to == @countryId OR r._from == @countryId
 		return r`
+
 	bindVars := map[string]interface{}{
 		"countryId": countryId,
 	}
@@ -28,6 +29,7 @@ func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error)
 			break
 		} else if err != nil {
 			logger.Warning(err.Error())
+			continue
 		}
 
 		relList = append(relList, doc)
@@ -39,13 +41,13 @@ func RelationshipGetFromCountry(countryId string) ([]models.Relationship, error)
 func RelationshipCreate(rel models.Relationship) (models.Relationship, error) {
 	var f models.Relationship
 
-	meta, err := createDocument(relationshipCollection, rel)
+	meta, err := createDocument(relationshipCollectionName, rel)
 	if err != nil {
 		return f, err
 	}
 
 	var out models.Relationship
-	_, err = getDocument(relationshipCollection, meta.Key, &out)
+	_, err = getDocument(relationshipCollectionName, meta.Key, &out)
 	if err != nil {
 		return f, err
 	}
