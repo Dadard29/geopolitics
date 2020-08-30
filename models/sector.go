@@ -3,8 +3,8 @@ package models
 import "math"
 
 type SectorProportion struct {
-	Name       string
-	Proportion float64
+	Name       string `json:"name"`
+	Proportion float64 `json:"proportion"`
 }
 
 type SectorQuantityArray struct {

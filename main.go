@@ -18,19 +18,14 @@ var routes = service.RouteMapping{
 			http.MethodGet:  controllers.RelationshipGet,
 		},
 	},
-	"/relationships/all": service.Route{
-		Description: "manage all edges at once",
+	"/relationships/details": service.Route{
+		Description: "manage edges between country nodes",
 		MethodMapping: service.MethodMapping{
-			http.MethodGet: controllers.RelationshipAllGet,
+			http.MethodGet:  controllers.RelationshipDetailsGet,
 		},
 	},
 	"/countries": service.Route{
 		Description:   "manage countries one by one",
-		MethodMapping: service.MethodMapping{
-		},
-	},
-	"/countries/all": service.Route{
-		Description:   "manage countries all at once",
 		MethodMapping: service.MethodMapping{
 			http.MethodGet: controllers.CountryAllGet,
 		},

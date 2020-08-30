@@ -8,6 +8,7 @@ import (
 	"github.com/Dadard29/go-api-utils/log/logLevel"
 	"github.com/arangodb/go-driver"
 	"github.com/arangodb/go-driver/http"
+	"strings"
 )
 
 var logger = log.NewLogger("REPOSITORY", logLevel.DEBUG)
@@ -89,6 +90,12 @@ func createDocument(collection string, doc interface{}) (driver.DocumentMeta, er
 	}
 	logger.Debug(fmt.Sprintf("created document with Key %s", meta.Key))
 	return meta, nil
+}
+
+// return key from id
+// 'country/FRA' gives 'FRA'
+func KeyFromId(id string) string {
+	return strings.Split(id, "/")[1]
 }
 
 // init driver

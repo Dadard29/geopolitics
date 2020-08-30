@@ -14,7 +14,7 @@ import (
 // POST
 // Authorization: 	token
 // Params: 			None
-// Body: 			None
+// Body: 			models.RelationshipInput
 func RelationshipPost(w http.ResponseWriter, r *http.Request) {
 	accessToken := auth.ParseApiKey(r, accessTokenKey, true)
 	if !checkToken(accessToken, w) {
@@ -80,7 +80,7 @@ func RelationshipGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rel, err := managers.RelationshipManagerGet(country)
+	rel, err := managers.RelationshipManagerGetFromCountry(country)
 	if err != nil {
 		logger.Error(err.Error())
 		api.Api.BuildErrorResponse(http.StatusInternalServerError, "couldn't process request", w)
@@ -94,13 +94,29 @@ func RelationshipGet(w http.ResponseWriter, r *http.Request) {
 // Authorization: 	token
 // Params: 			None
 // Body: 			None
-func RelationshipAllGet(w http.ResponseWriter, r *http.Request) {
+func RelationshipDetailsGet(w http.ResponseWriter, r *http.Request) {
 	accessToken := auth.ParseApiKey(r, accessTokenKey, true)
 	if !checkToken(accessToken, w) {
 		return
 	}
 
-	// TODO
+	countryAKey := r.URL.Query().Get("countryAKey")
+	countryBKey := r.URL.Query().Get("countryBKey")
+	if countryAKey == "" || countryBKey == "" {
+		api.Api.BuildMissingParameter(w)
+		return
+	}
 
-	api.Api.BuildJsonResponse(true, "ok", nil, w)
+	g, err := managers.RelationshipManagerDetails(countryAKey, countryBKey)
+	if err != nil {
+		logger.Error(err.Error())
+		api.Api.BuildErrorResponse(http.StatusInternalServerError, "failed to get details", w)
+		return
+	}
+
+	api.Api.BuildJsonResponse(true,
+		fmt.Sprintf(
+			"got details about relationship between `%s` and `%s`",
+			g.Nodes[0].Name, g.Nodes[1].Name),
+		g, w)
 }

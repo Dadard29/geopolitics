@@ -37,6 +37,7 @@ type RelationshipInput struct {
 	Impact      int       `json:"impact"`
 }
 
+// fixme: check sector, check link host
 func (rel RelationshipInput) CheckSanity() error {
 	if rel.Subject == "" ||
 		rel.ArticleLink == "" ||

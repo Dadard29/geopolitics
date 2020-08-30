@@ -5,14 +5,7 @@ import (
 	"fmt"
 	"github.com/Dadard29/geopolitics/models"
 	"github.com/arangodb/go-driver"
-	"strings"
 )
-
-// return key from id
-// 'country/FRA' gives 'FRA'
-func CountryKeyFromId(id string) string {
-	return strings.Split(id, "/")[1]
-}
 
 // return all countries
 func CountryGetAll() ([]models.CountryDto, error) {

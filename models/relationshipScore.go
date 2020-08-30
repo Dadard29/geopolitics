@@ -15,6 +15,19 @@ type RelationshipSetArray struct {
 	Sets []RelationshipSet
 }
 
+func (setArray RelationshipSetArray) ToScoreArray() ([]RelationshipScore, error) {
+	var rs = make([]RelationshipScore, 0)
+	for _, s := range setArray.Sets {
+		score, err := s.ToScore()
+		if err != nil {
+			return nil, err
+		}
+		rs = append(rs, score)
+	}
+
+	return rs, nil
+}
+
 func NewRelationshipSetArray(rels []RelationshipEntity) RelationshipSetArray {
 	var array = make([]RelationshipSet, 0)
 
@@ -88,7 +101,7 @@ func (set RelationshipSet) ToScore() (RelationshipScore, error) {
 		}
 
 		// update score
-		// todo
+		// todo: test if indicator relevant
 		out.Score += r.Impact
 	}
 

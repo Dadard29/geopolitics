@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"github.com/Dadard29/geopolitics/models"
 	"github.com/Dadard29/geopolitics/repositories"
+	"time"
 )
 
 // returns all edges (scores) connected to a specific country
-// todo: useful ?
-func RelationshipManagerGet(countryKey string) (models.GraphScore, error) {
+func RelationshipManagerGetFromCountry(countryKey string) (models.GraphScore, error) {
 	var f models.GraphScore
 
 	meta, countryEntity, err := repositories.CountryGet(countryKey)
@@ -35,9 +35,9 @@ func RelationshipManagerGet(countryKey string) (models.GraphScore, error) {
 		var countryLinkedKey string
 
 		if r.FromId != countryId {
-			countryLinkedKey = repositories.CountryKeyFromId(r.FromId)
+			countryLinkedKey = repositories.KeyFromId(r.FromId)
 		} else if r.ToId != countryId {
-			countryLinkedKey = repositories.CountryKeyFromId(r.ToId)
+			countryLinkedKey = repositories.KeyFromId(r.ToId)
 		} else {
 			return f, errors.New(fmt.Sprintf("relationship loop detected on country %s", countryId))
 		}
@@ -63,15 +63,9 @@ func RelationshipManagerGet(countryKey string) (models.GraphScore, error) {
 	}
 
 	// convert relationships to score edges
-	relSetArray := models.NewRelationshipSetArray(rels)
-	var scores = make([]models.RelationshipScore, 0)
-	for _, rs := range relSetArray.Sets {
-		newScore, err := rs.ToScore()
-		if err != nil {
-			logger.Warning(err.Error())
-			continue
-		}
-		scores = append(scores, newScore)
+	scores, err := models.NewRelationshipSetArray(rels).ToScoreArray()
+	if err != nil {
+		return f, err
 	}
 
 	return models.GraphScore{
@@ -81,8 +75,7 @@ func RelationshipManagerGet(countryKey string) (models.GraphScore, error) {
 
 }
 
-// create a relationship between 2 countries
-// return a graph with the 2 countries and the created edge
+// create a relationship between 2 countries, returns a graph with the 2 countries and the created edge
 func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.Graph, error) {
 	var f models.Graph
 
@@ -122,5 +115,52 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 		Edges: []models.RelationshipEntity{
 			rel,
 		},
+	}, nil
+}
+
+
+// return all edges connecting 2 countries
+func RelationshipManagerDetails(countryKeyA string, countryKeyB string) (models.GraphDetail, error) {
+	var f models.GraphDetail
+
+	meta, countryA, err := repositories.CountryGet(countryKeyA)
+	if err != nil {
+		return f, nil
+	}
+	countryADto := countryA.ToDto(meta)
+
+	meta, countryB, err := repositories.CountryGet(countryKeyB)
+	if err != nil {
+		return f, nil
+	}
+	countryBDto := countryB.ToDto(meta)
+
+	relList, err := repositories.RelationshipGetDetails(countryADto.Id, countryBDto.Id)
+	sets := models.NewRelationshipSetArray(relList)
+	scores, err := sets.ToScoreArray()
+	if err != nil {
+		return f, err
+	}
+
+	if len(scores) > 1 {
+		return f, errors.New("the relationship query fucked up")
+	}
+
+	// fallback value (no scored value found in db)
+	scoreValue := models.RelationshipScore{
+		Country_A_Id:      countryADto.Id,
+		Country_B_Id:      countryBDto.Id,
+		Score:             0,
+		SectorRepartition: nil,
+		LastUpdate:        time.Time{},
+	}
+	if len(scores) != 0 {
+		scoreValue = scores[0]
+	}
+
+	return models.GraphDetail{
+		Nodes:       []models.CountryDto{countryADto, countryBDto},
+		EdgeScore:   scoreValue,
+		EdgeHistory: relList,
 	}, nil
 }
