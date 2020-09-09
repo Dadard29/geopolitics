@@ -151,7 +151,7 @@ func RelationshipManagerDetails(countryKeyA string, countryKeyB string) (models.
 		Country_A_Id:      countryADto.Id,
 		Country_B_Id:      countryBDto.Id,
 		Score:             0,
-		SectorRepartition: nil,
+		SectorRepartition: make([]models.SectorProportion, 0),
 		LastUpdate:        time.Time{},
 	}
 	if len(scores) != 0 {
