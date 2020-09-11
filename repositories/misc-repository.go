@@ -20,6 +20,8 @@ var countryCollectionName = "country"
 var relationshipCollectionName = "relationship"
 var regionNodesCollectionName = "region_nodes"
 var regionEdgesCollectionName = "region_edges"
+var organisationNodesCollectionName = "organisation_nodes"
+var organisationEdgesCollectionName = "organisation_edges"
 
 func executeQuery(query string, bindVars map[string]interface{}) (driver.Cursor, error) {
 	return connector.Query(ctx, query, bindVars)

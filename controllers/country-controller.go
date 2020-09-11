@@ -28,7 +28,6 @@ func CountryAllGet(w http.ResponseWriter, r *http.Request) {
 		out, err = managers.CountryManagerGetRegion(region)
 	}
 
-
 	if err != nil {
 		logger.Error(err.Error())
 		api.Api.BuildErrorResponse(http.StatusInternalServerError,

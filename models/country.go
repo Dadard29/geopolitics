@@ -28,13 +28,20 @@ type CountryDto struct {
 		Latitude  float32 `json:"latitude"`
 		Longitude float32 `json:"longitude"`
 	} `json:"coordinate"`
-	Currencies []string `json:"currencies"`
-	Languages  []string `json:"languages"`
-	Flag       string   `json:"flag"`
-	Rank       int      `json:"rank"`
+	Currencies       []string `json:"currencies"`
+	Languages        []string `json:"languages"`
+	Flag             string   `json:"flag"`
+	Rank             int      `json:"rank"`
+	OrganisationKeys []string `json:"organisation_keys"`
 }
 
-func (c CountryEntity) ToDto(meta driver.DocumentMeta) CountryDto {
+func (c CountryEntity) ToDto(meta driver.DocumentMeta, orgs []OrganisationNodeDto) CountryDto {
+
+	orgsKeys := make([]string, 0)
+	for _, o := range orgs {
+		orgsKeys = append(orgsKeys, o.Key)
+	}
+
 	return CountryDto{
 		Key:        meta.Key,
 		Id:         meta.ID.String(),
@@ -48,9 +55,10 @@ func (c CountryEntity) ToDto(meta driver.DocumentMeta) CountryDto {
 			Latitude:  c.Coordinate.Latitude,
 			Longitude: c.Coordinate.Longitude,
 		},
-		Currencies: c.Currencies,
-		Languages:  c.Languages,
-		Flag:       c.Flag,
-		Rank:       c.Rank,
+		Currencies:       c.Currencies,
+		Languages:        c.Languages,
+		Flag:             c.Flag,
+		Rank:             c.Rank,
+		OrganisationKeys: orgsKeys,
 	}
 }

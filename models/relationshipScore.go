@@ -35,7 +35,7 @@ func NewRelationshipSetArray(rels []RelationshipEntity) RelationshipSetArray {
 		// check if a set exists already
 		exists := false
 		for i, s := range array {
-			if 	(s.Country_A_Id == r.FromId && s.Country_B_Id == r.ToId) ||
+			if (s.Country_A_Id == r.FromId && s.Country_B_Id == r.ToId) ||
 				(s.Country_A_Id == r.ToId && s.Country_B_Id == r.FromId) {
 				array[i].Relationships = append(s.Relationships, r)
 				exists = true
@@ -54,7 +54,7 @@ func NewRelationshipSetArray(rels []RelationshipEntity) RelationshipSetArray {
 		})
 	}
 
-	return RelationshipSetArray{Sets:array}
+	return RelationshipSetArray{Sets: array}
 }
 
 func (set RelationshipSet) ToScore() (RelationshipScore, error) {
@@ -118,9 +118,9 @@ func (set RelationshipSet) ToScore() (RelationshipScore, error) {
 // recap about the global relations between 2 countries
 // computed from relationships analysis
 type RelationshipScore struct {
-	Country_A_Id string `json:"_from"`
-	Country_B_Id string `json:"_to"`
-	Score        int    `json:"score"`
+	Country_A_Id      string             `json:"_from"`
+	Country_B_Id      string             `json:"_to"`
+	Score             int                `json:"score"`
 	SectorRepartition []SectorProportion `json:"sectorRepartition"`
-	LastUpdate   time.Time `json:"lastUpdate"`
+	LastUpdate        time.Time          `json:"lastUpdate"`
 }

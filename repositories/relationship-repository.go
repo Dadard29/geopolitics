@@ -40,7 +40,6 @@ func RelationshipGetFromCountry(countryId string) ([]models.RelationshipEntity, 
 	return relList, nil
 }
 
-
 // create rel in db
 func RelationshipCreate(rel models.RelationshipEntity) (models.RelationshipEntity, error) {
 	var f models.RelationshipEntity

@@ -7,6 +7,44 @@ import (
 	"github.com/arangodb/go-driver"
 )
 
+func CountryOrganisations(countryId string) ([]models.OrganisationNodeDto, error) {
+	f := make([]models.OrganisationNodeDto, 0)
+
+	query := `
+		FOR i IN @@collection
+			FILTER i._from == @country
+			RETURN DOCUMENT(i._to)
+	`
+	bindVars := map[string]interface{}{
+		"@collection": organisationEdgesCollectionName,
+		"country":     countryId,
+	}
+
+	cursor, err := executeQuery(query, bindVars)
+	if err != nil {
+		return f, err
+	}
+
+	defer cursor.Close()
+
+	var orgLIst = make([]models.OrganisationNodeDto, 0)
+	for {
+		var doc models.OrganisationNode
+		meta, err := cursor.ReadDocument(ctx, &doc)
+		if driver.IsNoMoreDocuments(err) {
+			break
+		} else if err != nil {
+			logger.Warning(err.Error())
+			continue
+		}
+
+		orgLIst = append(orgLIst, doc.ToDto(meta))
+	}
+
+	return orgLIst, nil
+
+}
+
 // return all countries
 func CountryGetAll() ([]models.CountryDto, error) {
 	var f []models.CountryDto
@@ -39,10 +77,16 @@ func CountryGetAll() ([]models.CountryDto, error) {
 		} else if err != nil {
 			logger.Warning(err.Error())
 			continue
-		} else {
-			out = append(out, country.ToDto(meta))
-			total += 1
 		}
+
+		countryId := meta.ID.String()
+		orgs, err := CountryOrganisations(countryId)
+		if err != nil {
+			logger.Warning(err.Error())
+			continue
+		}
+		out = append(out, country.ToDto(meta, orgs))
+		total += 1
 	}
 
 	logger.Debug(fmt.Sprintf("fetched %d documents", total))
@@ -58,14 +102,13 @@ func CountryGetRegion(region string) ([]models.CountryDto, error) {
 		return nil, errors.New("region not found")
 	}
 
-
 	query := `FOR doc IN @@collection
 				  FILTER doc._to == @region
 				  RETURN DOCUMENT(doc._from)`
 
 	bindVars := map[string]interface{}{
 		"@collection": regionEdgesCollectionName,
-		"region": regionNodeMeta.ID.String(),
+		"region":      regionNodeMeta.ID.String(),
 	}
 
 	cursor, err := executeQuery(query, bindVars)
@@ -86,7 +129,14 @@ func CountryGetRegion(region string) ([]models.CountryDto, error) {
 			continue
 		}
 
-		relList = append(relList, doc.ToDto(meta))
+		countryId := meta.ID.String()
+		orgs, err := CountryOrganisations(countryId)
+		if err != nil {
+			logger.Warning(err.Error())
+			continue
+		}
+
+		relList = append(relList, doc.ToDto(meta, orgs))
 	}
 
 	return relList, nil

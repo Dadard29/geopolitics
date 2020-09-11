@@ -65,8 +65,6 @@ func CountryManagerGetRegion(region string) (models.GraphScore, error) {
 		return f, nil
 	}
 
-
-
 	return models.GraphScore{
 		Nodes: countriesRegion,
 		Edges: scores,

@@ -3,7 +3,7 @@ package models
 import "math"
 
 type SectorProportion struct {
-	Name       string `json:"name"`
+	Name       string  `json:"name"`
 	Proportion float64 `json:"proportion"`
 }
 
@@ -13,7 +13,7 @@ type SectorQuantityArray struct {
 }
 
 type SectorQuantity struct {
-	Name string
+	Name     string
 	Quantity int
 }
 

@@ -19,6 +19,11 @@ func RelationshipManagerGetFromCountry(countryKey string) (models.GraphScore, er
 
 	countryId := meta.ID.String()
 
+	orgs, err := repositories.CountryOrganisations(countryId)
+	if err != nil {
+		return f, err
+	}
+
 	// get the rels array
 	rels, err := repositories.RelationshipGetFromCountry(countryId)
 	if err != nil {
@@ -27,7 +32,7 @@ func RelationshipManagerGetFromCountry(countryKey string) (models.GraphScore, er
 
 	// init node array
 	nodes := []models.CountryDto{
-		countryEntity.ToDto(meta),
+		countryEntity.ToDto(meta, orgs),
 	}
 
 	// get all connected nodes
@@ -59,7 +64,14 @@ func RelationshipManagerGetFromCountry(countryKey string) (models.GraphScore, er
 		if err != nil {
 			return f, err
 		}
-		nodes = append(nodes, countryLinked.ToDto(meta))
+
+		countryLinkedId := meta.ID.String()
+
+		orgs, err := repositories.CountryOrganisations(countryLinkedId)
+		if err != nil {
+			return f, err
+		}
+		nodes = append(nodes, countryLinked.ToDto(meta, orgs))
 	}
 
 	// convert relationships to score edges
@@ -85,7 +97,11 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 		return f, err
 	}
 
-	countryFromDto := countryFrom.ToDto(meta)
+	orgsFrom, err := repositories.CountryOrganisations(meta.ID.String())
+	if err != nil {
+		return f, err
+	}
+	countryFromDto := countryFrom.ToDto(meta, orgsFrom)
 	countryFromId := meta.ID.String()
 
 	meta, countryTo, err := repositories.CountryGet(toKey)
@@ -94,7 +110,11 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 		return f, err
 	}
 
-	countryToDto := countryTo.ToDto(meta)
+	orgsTo, err := repositories.CountryOrganisations(meta.ID.String())
+	if err != nil {
+		return f, err
+	}
+	countryToDto := countryTo.ToDto(meta, orgsTo)
 	countryToId := meta.ID.String()
 
 	entity, err := relInput.ToEntity(countryFromId, countryToId)
@@ -118,7 +138,6 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 	}, nil
 }
 
-
 // return all edges connecting 2 countries
 func RelationshipManagerDetails(countryKeyA string, countryKeyB string) (models.GraphDetail, error) {
 	var f models.GraphDetail
@@ -127,13 +146,21 @@ func RelationshipManagerDetails(countryKeyA string, countryKeyB string) (models.
 	if err != nil {
 		return f, nil
 	}
-	countryADto := countryA.ToDto(meta)
+	countryAOrgs, err := repositories.CountryOrganisations(meta.ID.String())
+	if err != nil {
+		return f, err
+	}
+	countryADto := countryA.ToDto(meta, countryAOrgs)
 
 	meta, countryB, err := repositories.CountryGet(countryKeyB)
 	if err != nil {
 		return f, nil
 	}
-	countryBDto := countryB.ToDto(meta)
+	countryBOrgs, err := repositories.CountryOrganisations(meta.ID.String())
+	if err != nil {
+		return f, err
+	}
+	countryBDto := countryB.ToDto(meta, countryBOrgs)
 
 	relList, err := repositories.RelationshipGetDetails(countryADto.Id, countryBDto.Id)
 	sets := models.NewRelationshipSetArray(relList)
