@@ -24,6 +24,13 @@ var routes = service.RouteMapping{
 			http.MethodGet: controllers.RelationshipDetailsGet,
 		},
 	},
+	"/relationships/pending": service.Route{
+		Description:   "manage relationships to be confirmed",
+		MethodMapping: service.MethodMapping{
+			http.MethodPost: controllers.RelationshipPendingPost,
+			http.MethodGet: controllers.RelationshipPendingGet,
+		},
+	},
 	"/countries": service.Route{
 		Description: "manage countries one by one",
 		MethodMapping: service.MethodMapping{
