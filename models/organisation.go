@@ -4,7 +4,7 @@ import "github.com/arangodb/go-driver"
 
 type OrganisationNode struct {
 	Name          string `json:"name"`
-	Formation     string    `json:"formation"`
+	Formation     string `json:"formation"`
 	Description   string `json:"description"`
 	Documentation string `json:"documentation"`
 	Logo          string `json:"logo"`
@@ -14,7 +14,7 @@ type OrganisationNodeDto struct {
 	Id            string `json:"id"`
 	Key           string `json:"key"`
 	Name          string `json:"name"`
-	Formation     string    `json:"formation"`
+	Formation     string `json:"formation"`
 	Description   string `json:"description"`
 	Documentation string `json:"documentation"`
 	Logo          string `json:"logo"`

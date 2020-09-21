@@ -25,10 +25,12 @@ var routes = service.RouteMapping{
 		},
 	},
 	"/relationships/pending": service.Route{
-		Description:   "manage relationships to be confirmed",
+		Description: "manage relationships to be confirmed",
 		MethodMapping: service.MethodMapping{
-			http.MethodPost: controllers.RelationshipPendingPost,
-			http.MethodGet: controllers.RelationshipPendingGet,
+			http.MethodPost:   controllers.RelationshipPendingPost,
+			http.MethodGet:    controllers.RelationshipPendingGet,
+			http.MethodDelete: controllers.RelationshipPendingDelete,
+			http.MethodPut:    controllers.RelationshipPendingPut,
 		},
 	},
 	"/countries": service.Route{
@@ -38,7 +40,7 @@ var routes = service.RouteMapping{
 		},
 	},
 	"/organisations": service.Route{
-		Description:   "manage organisations",
+		Description: "manage organisations",
 		MethodMapping: service.MethodMapping{
 			http.MethodGet: controllers.OrganisationGet,
 		},
