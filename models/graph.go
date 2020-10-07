@@ -3,7 +3,7 @@ package models
 // contain arbitrary edges and nodes
 type Graph struct {
 	Nodes []CountryDto         `json:"nodes"`
-	Edges []RelationshipEntity `json:"edges"`
+	Edges []RelationshipDto `json:"edges"`
 }
 
 // contain one edge (score) per country-pair
@@ -16,5 +16,5 @@ type GraphScore struct {
 type GraphDetail struct {
 	Nodes       []CountryDto         `json:"nodes"`
 	EdgeScore   RelationshipScore    `json:"edgeScore"`
-	EdgeHistory []RelationshipEntity `json:"edgeHistory"`
+	EdgeHistory []RelationshipDto `json:"edgeHistory"`
 }

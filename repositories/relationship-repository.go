@@ -10,6 +10,7 @@ import (
 func RelationshipGetFromCountry(countryId string) ([]models.RelationshipEntity, error) {
 	query := `FOR r in relationship
 		FILTER r._to == @countryId OR r._from == @countryId
+		SORT r.date DESC
 		return r`
 
 	bindVars := map[string]interface{}{

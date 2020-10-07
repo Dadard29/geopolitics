@@ -37,3 +37,26 @@ func CountryAllGet(w http.ResponseWriter, r *http.Request) {
 
 	api.Api.BuildJsonResponse(true, "countries retrieved", out, w)
 }
+
+func CountryDetailsGet(w http.ResponseWriter, r *http.Request) {
+	accessToken := auth.ParseApiKey(r, accessTokenKey, true)
+	if !checkToken(accessToken, w) {
+		return
+	}
+
+	country := r.URL.Query().Get("country")
+	if country == "" {
+		api.Api.BuildMissingParameter(w)
+		return
+	}
+
+	out, err := managers.CountryManagerGetDetails(country)
+
+	if err != nil {
+		logger.Error(err.Error())
+		api.Api.BuildErrorResponse(http.StatusInternalServerError, "error getting country details", w)
+		return
+	}
+
+	api.Api.BuildJsonResponse(true, "country details retrieved", out, w)
+}

@@ -70,3 +70,34 @@ func CountryManagerGetRegion(region string) (models.GraphScore, error) {
 		Edges: scores,
 	}, nil
 }
+
+func CountryManagerGetDetails(countryKey string) (models.CountryDetails, error) {
+	var f models.CountryDetails
+
+	meta, countryEntity, err := repositories.CountryGet(countryKey)
+	if err != nil {
+		return f, err
+	}
+
+	orgs, err := repositories.CountryOrganisations(meta.ID.String())
+	if err != nil {
+		return f, err
+	}
+
+	countryDto := countryEntity.ToDto(meta, orgs)
+
+	rels, err := repositories.RelationshipGetFromCountry(countryDto.Id)
+	if err != nil {
+		return f, err
+	}
+
+	var relsDto []models.RelationshipDto
+	for _, r := range rels {
+		relsDto = append(relsDto, r.ToDto())
+	}
+
+	return models.CountryDetails{
+		Country:       countryDto,
+		Relationships: relsDto,
+	}, nil
+}

@@ -35,6 +35,11 @@ type CountryDto struct {
 	OrganisationKeys []string `json:"organisation_keys"`
 }
 
+type CountryDetails struct {
+	Country CountryDto `json:"country"`
+	Relationships []RelationshipDto `json:"relationships"`
+}
+
 func (c CountryEntity) ToDto(meta driver.DocumentMeta, orgs []OrganisationNodeDto) CountryDto {
 
 	orgsKeys := make([]string, 0)

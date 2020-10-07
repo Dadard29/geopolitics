@@ -82,3 +82,27 @@ type RelationshipEntity struct {
 	Date        time.Time `json:"date"`
 	Impact      int       `json:"impact"`
 }
+
+type RelationshipDto struct {
+	FromId      string    `json:"_from"`
+	ToId        string    `json:"_to"`
+	Subject     string    `json:"subject"`
+	ArticleLink string    `json:"article_link"`
+	Brief       string    `json:"brief"`
+	Sector      string    `json:"sector"`
+	Date        time.Time `json:"date"`
+	Impact      int       `json:"impact"`
+}
+
+func (r RelationshipEntity) ToDto() RelationshipDto {
+	return RelationshipDto{
+		FromId:      r.FromId,
+		ToId:        r.ToId,
+		Subject:     r.Subject,
+		ArticleLink: r.ArticleLink,
+		Brief:       r.Brief,
+		Sector:      r.Sector,
+		Date:        r.Date,
+		Impact:      r.Impact,
+	}
+}

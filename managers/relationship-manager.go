@@ -8,85 +8,6 @@ import (
 	"time"
 )
 
-// returns all edges (scores) connected to a specific country
-func RelationshipManagerGetFromCountry(countryKey string) (models.GraphScore, error) {
-	var f models.GraphScore
-
-	meta, countryEntity, err := repositories.CountryGet(countryKey)
-	if err != nil {
-		return f, err
-	}
-
-	countryId := meta.ID.String()
-
-	orgs, err := repositories.CountryOrganisations(countryId)
-	if err != nil {
-		return f, err
-	}
-
-	// get the rels array
-	rels, err := repositories.RelationshipGetFromCountry(countryId)
-	if err != nil {
-		return f, err
-	}
-
-	// init node array
-	nodes := []models.CountryDto{
-		countryEntity.ToDto(meta, orgs),
-	}
-
-	// get all connected nodes
-	for _, r := range rels {
-		var countryLinkedKey string
-
-		if r.FromId != countryId {
-			countryLinkedKey = repositories.KeyFromId(r.FromId)
-		} else if r.ToId != countryId {
-			countryLinkedKey = repositories.KeyFromId(r.ToId)
-		} else {
-			return f, errors.New(fmt.Sprintf("relationship loop detected on country %s", countryId))
-		}
-
-		// check if duplicate
-		found := false
-		for _, c := range nodes {
-			if c.Key == countryLinkedKey {
-				found = true
-			}
-		}
-
-		if found {
-			continue
-		}
-
-		// update node array
-		meta, countryLinked, err := repositories.CountryGet(countryLinkedKey)
-		if err != nil {
-			return f, err
-		}
-
-		countryLinkedId := meta.ID.String()
-
-		orgs, err := repositories.CountryOrganisations(countryLinkedId)
-		if err != nil {
-			return f, err
-		}
-		nodes = append(nodes, countryLinked.ToDto(meta, orgs))
-	}
-
-	// convert relationships to score edges
-	scores, err := models.NewRelationshipSetArray(rels).ToScoreArray()
-	if err != nil {
-		return f, err
-	}
-
-	return models.GraphScore{
-		Nodes: nodes,
-		Edges: scores,
-	}, nil
-
-}
-
 // create a relationship between 2 countries, returns a graph with the 2 countries and the created edge
 func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string, toKey string) (models.Graph, error) {
 	var f models.Graph
@@ -132,8 +53,8 @@ func RelationshipManagerCreate(relInput models.RelationshipInput, fromKey string
 			countryFromDto,
 			countryToDto,
 		},
-		Edges: []models.RelationshipEntity{
-			rel,
+		Edges: []models.RelationshipDto{
+			rel.ToDto(),
 		},
 	}, nil
 }
@@ -185,9 +106,14 @@ func RelationshipManagerDetails(countryKeyA string, countryKeyB string) (models.
 		scoreValue = scores[0]
 	}
 
+	var relListDto []models.RelationshipDto
+	for _, r := range relList {
+		relListDto = append(relListDto, r.ToDto())
+	}
+
 	return models.GraphDetail{
 		Nodes:       []models.CountryDto{countryADto, countryBDto},
 		EdgeScore:   scoreValue,
-		EdgeHistory: relList,
+		EdgeHistory: relListDto,
 	}, nil
 }

@@ -66,32 +66,6 @@ func RelationshipPost(w http.ResponseWriter, r *http.Request) {
 
 // GET
 // Authorization: 	token
-// Params: 			country
-// Body: 			None
-func RelationshipGet(w http.ResponseWriter, r *http.Request) {
-	accessToken := auth.ParseApiKey(r, accessTokenKey, true)
-	if !checkToken(accessToken, w) {
-		return
-	}
-
-	country := r.URL.Query().Get("country")
-	if country == "" {
-		api.Api.BuildMissingParameter(w)
-		return
-	}
-
-	rel, err := managers.RelationshipManagerGetFromCountry(country)
-	if err != nil {
-		logger.Error(err.Error())
-		api.Api.BuildErrorResponse(http.StatusInternalServerError, "couldn't process request", w)
-		return
-	}
-
-	api.Api.BuildJsonResponse(true, fmt.Sprintf("relationships for country %s retrieved", country), rel, w)
-}
-
-// GET
-// Authorization: 	token
 // Params: 			None
 // Body: 			None
 func RelationshipDetailsGet(w http.ResponseWriter, r *http.Request) {

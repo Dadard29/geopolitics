@@ -15,7 +15,6 @@ var routes = service.RouteMapping{
 		Description: "manage edges between country nodes",
 		MethodMapping: service.MethodMapping{
 			http.MethodPost: controllers.RelationshipPost,
-			http.MethodGet:  controllers.RelationshipGet,
 		},
 	},
 	"/relationships/details": service.Route{
@@ -37,6 +36,12 @@ var routes = service.RouteMapping{
 		Description: "manage countries one by one",
 		MethodMapping: service.MethodMapping{
 			http.MethodGet: controllers.CountryAllGet,
+		},
+	},
+	"/countries/details": service.Route{
+		Description: "manage countries one by one",
+		MethodMapping: service.MethodMapping{
+			http.MethodGet: controllers.CountryDetailsGet,
 		},
 	},
 	"/organisations": service.Route{
